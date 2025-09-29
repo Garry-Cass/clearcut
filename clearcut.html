@@ -1,0 +1,48 @@
+CLEARCUT 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ClearCut – Background Remover</title>
+  <style>
+    body{font-family:system-ui;background:#f5f5f5;text-align:center;padding:2rem}
+    #outputImg{max-width:90%;margin-top:1rem}
+    #loading{display:none;color:#0077ff}
+    input{margin:1rem 0}
+  </style>
+</head>
+<body>
+  <h1>ClearCut</h1>
+  <input type="file" id="imageUpload" accept="image/*">
+  <br>
+  <button id="submitBtn">Remove Background</button>
+  <p id="loading">Removing background…</p>
+  <img id="outputImg">
+  <script>
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      const file = document.getElementById("imageUpload").files[0];
+      if (!file) return alert("Pick an image");
+      document.getElementById("loading").style.display = "block";
+      document.getElementById("outputImg").src = "";
+      const form = new FormData();
+      form.append("image_file", file);
+      form.append("size", "auto");
+      try {
+        const r = await fetch("https://corsproxy.io/?" + encodeURIComponent("https://api.remove.bg/v1.0/removebg"), {
+          method: "POST",
+          headers: {"X-Api-Key": "FdxRvZQ2fFyDHnTooeMdFsTh"},
+          body: form
+        });
+        if (!r.ok) throw new Error(await r.text());
+        const blob = await r.blob();
+        document.getElementById("outputImg").src = URL.createObjectURL(blob);
+      } catch (e) {
+        alert("API error: " + e);
+      } finally {
+        document.getElementById("loading").style.display = "none";
+      }
+    });
+  </script>
+</body>
+</html>
